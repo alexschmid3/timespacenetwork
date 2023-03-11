@@ -10,7 +10,7 @@ include("scripts/createnetwork.jl")
 #Read experiment parameters 
 horizon = 168									#Length of time horizon in hours 
 tstep = 6										#Time discretization
-numlocs = 30										#Number of physical locations, can choose from 1 to 66 for this dataset
+numlocs = 30									#Number of physical locations, can choose from 1 to 66 for this dataset
 locationfilename = "data/locations.csv"
 arcfilename = "data/arcs.csv"
 randomseedval = 1905							#Set random seed if there are any random components of an algorithm
@@ -36,6 +36,6 @@ println("Num arcs = ", tsnetwork.numarcs)
 # numarcs --> total number of arcs 
 # arcid --> dictionary, arcs[n1, n2] = arc id for arc starting at n1 and ending at n2 (if it exists)
 # arcdesc --> dictionary, arclookup[a] = (startnode, endnode) of arc a
-# A_plus --> dictionary, A-plus[n] = list of arcs with startnode n (useful for flow-balance constraints)
+# A_plus --> dictionary, A_plus[n] = list of arcs with startnode n (useful for flow-balance constraints)
 # A_minus --> dictionary, A_minus[n] = list of arcs with endnode n (useful for flow-balance constraints)
 # arccost --> array of cost/distance of each arc
