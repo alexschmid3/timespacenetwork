@@ -4,16 +4,17 @@ using JuMP, Gurobi, Random, CSV, DataFrames, Statistics, Dates
 #-------------------------------------LOAD SCRIPTS-------------------------------------#
 
 include("scripts/createnetwork.jl")
+include("scripts/networkvisualization.jl")
 
 #----------------------------------NETWORK PARAMETERS----------------------------------#  	
 
 #Read experiment parameters 
 horizon = 168									#Length of time horizon in hours 
 tstep = 6										#Time discretization
-numlocs = 30									#Number of physical locations, can choose from 1 to 66 for this dataset
+numlocs = 20									#Number of physical locations, can choose from 1 to 66 for this dataset
 locationfilename = "data/locations.csv"
 arcfilename = "data/arcs.csv"
-randomseedval = 1905							#Set random seed if there are any random components of an algorithm
+randomseedval = 1906							#Set random seed if there are any random components of an algorithm
 Random.seed!(randomseedval)
 
 #-----------------------------------GENERATE NETWORK-----------------------------------# 
@@ -39,3 +40,9 @@ println("Num arcs = ", tsnetwork.numarcs)
 # A_plus --> dictionary, A_plus[n] = list of arcs with startnode n (useful for flow-balance constraints)
 # A_minus --> dictionary, A_minus[n] = list of arcs with endnode n (useful for flow-balance constraints)
 # arccost --> array of cost/distance of each arc
+ 
+#--------------------------------VISUALIZATION EXAMPLE---------------------------------# 
+
+#Get a list of arcs you want to display (usually from optimization solution, but just 50 random arcs for this example)
+arclist = [a for a in 1:tsnetwork.numarcs][randperm(tsnetwork.numarcs)[1:min(50, tsnetwork.numarcs)]]
+timespaceviz("visualizations/myviz.png", tsnetwork, arclist, x_size=2000, y_size=1000)
