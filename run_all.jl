@@ -5,13 +5,14 @@ using JuMP, Gurobi, Random, CSV, DataFrames, Statistics, Dates
 
 include("scripts/createnetwork.jl")
 include("scripts/networkvisualization.jl")
+include("scripts/arcreductionheuristic.jl")
 
 #----------------------------------NETWORK PARAMETERS----------------------------------#  	
 
 #Read experiment parameters 
-horizon = 168									#Length of time horizon in hours 
-tstep = 6										#Time discretization
-numlocs = 20									#Number of physical locations, can choose from 1 to 66 for this dataset
+horizon = 24									#Length of time horizon in hours 
+tstep = 1										#Time discretization
+numlocs = 10									#Number of physical locations, can choose from 1 to 66 for this dataset
 locationfilename = "data/locations.csv"
 arcfilename = "data/arcs.csv"
 randomseedval = 1906							#Set random seed if there are any random components of an algorithm
@@ -20,7 +21,7 @@ Random.seed!(randomseedval)
 #-----------------------------------GENERATE NETWORK-----------------------------------# 
 
 #Create node and arc networks
-tsnetwork = createfullnetwork(locationfilename, arcfilename, numlocs, horizon, tstep)
+tsnetwork, physicalarcs = createfullnetwork(locationfilename, arcfilename, numlocs, horizon, tstep)
 
 #Print some fun facts
 println("Initialized time space network with...")
@@ -41,8 +42,24 @@ println("Num arcs = ", tsnetwork.numarcs)
 # A_minus --> dictionary, A_minus[n] = list of arcs with endnode n (useful for flow-balance constraints)
 # arccost --> array of cost/distance of each arc
  
+#---------------------------ARC REDUCTION HEURISTIC EXAMPLE----------------------------# 
+
+#Select origin location, start time, and destination location used to restrict the arcs
+originloc = 1
+origintime = 2
+destloc = 6
+
+#Select the parameter to restrict the arcs (select k and ktype as needed)
+# ktype = "shortestpathpercent", k = 0.5 --> will only include arcs that are part of a path from origin to destination than is no worse that 50% slower than the shortest path 
+# ktype = "absolutetime", k = 10 --> will only include arcs that are part of a path from origin to destination that is no worse than 10 hours (or whatever time units) slower than the shortest path 
+k = 0.5
+ktype = "shortestpathpercent"
+
+#Find the restricted arc set satisfying the above criteria
+restrictedarcset = findrestrictedarcset(tsnetwork, k, ktype, originloc, origintime, destloc)
+
 #--------------------------------VISUALIZATION EXAMPLE---------------------------------# 
 
 #Get a list of arcs you want to display (usually from optimization solution, but just 50 random arcs for this example)
-arclist = [a for a in 1:tsnetwork.numarcs][randperm(tsnetwork.numarcs)[1:min(50, tsnetwork.numarcs)]]
-timespaceviz("visualizations/myviz.png", tsnetwork, arclist, x_size=2000, y_size=1000)
+#arclist = [a for a in 1:tsnetwork.numarcs][randperm(tsnetwork.numarcs)[1:min(50, tsnetwork.numarcs)]]
+timespaceviz("visualizations/myrestrictedarcset.png", tsnetwork, restrictedarcset, x_size=2000, y_size=1000)

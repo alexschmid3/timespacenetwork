@@ -109,6 +109,6 @@ function createfullnetwork(locationfilename, arcfilename, numlocs, horizon, tste
 	#Create a NamedTuple with all the useful network data/parameters
 	tsnetwork = (loccoords=loccoords, numnodes=numnodes, nodeid=nodeid, nodedesc=nodedesc, times=times, numarcs=numarcs, arcid=arcid, arcdesc=arcdesc, A_plus=A_plus, A_minus=A_minus, arccost=arccost)
 
-	return tsnetwork
+	return tsnetwork, physicalarcs
 
 end
